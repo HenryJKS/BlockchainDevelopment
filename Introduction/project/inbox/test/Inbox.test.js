@@ -39,7 +39,7 @@ beforeEach(async () => {
     // o inbox é uma instancia do contrato.
     // o Contrato é uma função construtora e nos permite interagir com o contrato ou criar e implantar novos contratos.
     inbox = await new web3.eth.Contract(JSON.parse(interface))
-        .deploy({ data: bytecode, arguments: ['Hi There!'] })
+        .deploy({ data: bytecode, arguments: ['Hi There!', 6, 5] })
         .send({ from: accounts[0], gas: '1000000' });
 });
 
@@ -57,6 +57,10 @@ describe('Inbox', () => {
         assert.equal(message, 'Hi There!');
     });
 
-    it('can change the message', async () => {  
-    })
+    // Teste para mudar a mensagem.
+    it('can change the message', async () => { 
+        await inbox.methods.setMessage('Bye').send({from: accounts[0]});
+        const message = await inbox.methods.message().call();
+        assert.equal(message, 'Bye');
+    });
 });

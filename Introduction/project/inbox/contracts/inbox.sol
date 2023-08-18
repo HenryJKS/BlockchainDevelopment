@@ -1,5 +1,5 @@
 // Especifica a versão do Solidity  
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.26;
 
 // Definindo a estrutura de um contrato
 // a palavra "contract" é um como uma palavra-chave
@@ -37,8 +37,8 @@ contract Inbox {
     }
 
     //Criando terceira função
+    // Essa função não é necessário já que quando criamos uma variavel publica ele ja cria uma função de retorno.
     function getMessage() public view returns (string) {
         return message;
     }
-
 }
