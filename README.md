@@ -4,7 +4,7 @@
 - 📄 Atualmente Estudando sobre **Blockchain** 
 - 📫 Contato **henryjooji30@gmail.com**
 - 🔧 Ferramentas usadas: **Solidity**
-- 💻✔️ **Oracle SQL / mySQL / SQL Server / MDX**
+- 💻✔️ **Remix Ethereum**
 
 
 <h3 align="left">Conecte-se comigo:</h3><p align="left">
