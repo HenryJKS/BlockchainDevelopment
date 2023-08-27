@@ -15,7 +15,7 @@ const {abi, evm} = require('./compile');
     'between inform top steel awkward below dress mother spare banana iron law',
 
     // segundo argumento: link para a rede ethereum.
-    'https://sepolia.infura.io/v3/e879c54bce92402bac35cddc3db2ac0a'
+    'https://sepolia.infura.io/v3/ea477898b8754b17829cb4ba95b8cbed'
 );
 
 // Instanciando o Web3 com o provider.
@@ -37,7 +37,7 @@ const deploy = async() => {
         .send({ gas : '1000000', from : accounts[0]});
 
     // Imprimindo o endereço do contrato implantado.
-    console.log('Contract deployed to:', result.options.adress)
+    console.log('Contract deployed to:', result.options.address)
 
     // Encerrando o provider.
     provider.engine.stop();
