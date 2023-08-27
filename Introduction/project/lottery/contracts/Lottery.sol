@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 contract Lottery {
     // Queremos usar essa variável onde terá o endereço do dono do contrato
     address public manager;
     // Uma array onde os endereços dos jogadores vão entrar na loteria
-    address[] public players;
+    address payable[] public players;
 
     constructor() {
         // usamos o construtor para setar o endereço na variável managager de quem implantar o contrato na rede
@@ -21,7 +21,7 @@ contract Lottery {
         // nesse require a condição é que o valor transferido tem que ser maior que 0.1 ether
         require(msg.value > .01 ether);
 
-        players.push(msg.sender);
+        players.push(payable(msg.sender));
     }
 
     // Criando uma função pseudoaleatório
@@ -35,7 +35,7 @@ contract Lottery {
         // usamos abi.encodePack para codificar um conjunto de valores, e passamos para o keccak
         // logo após convertemos para um valor uint
 
-        return uint(keccak256(abi.encodePacked(block.prevrandao,block.timestamp, players)));
+        return uint(keccak256(abi.encodePacked(block.prevrandao, block.timestamp, players)));
     }
 
     // criando a função para escolher um vencedor
@@ -44,12 +44,13 @@ contract Lottery {
 
         uint index = random() % players.length;
 
+        // transferindo o valor do contrato para o endereço do vencedor
+        players[index].transfer(address(this).balance);
+
         // Para sempre que finalizar um sorteio inicializará outro
         // o (0) significa que o array inicializará com nenhum elementos.
-        players = new address[](0);
+        players = new address payable[](0);
 
-        // Quando selecionado o endereço do jogador queremos enviar o ether para a conta dela
-        payable(players[index]).transfer(address(this).balance);
     }
 
     /* um modifier é um pedaço de código que pode ser reutilizado em várias funções em Solidity. 
@@ -64,7 +65,7 @@ contract Lottery {
     }
 
     // Função para retornar todos os players
-    function returnPlayers() public view returns (address[] memory) {
+    function returnPlayers() public view returns (address payable[] memory) {
         return players;
     }
 
