@@ -1,30 +1,106 @@
-import React from 'react';
-import './App.css';
-import web3 from './web3';
-import lottery from './lottery';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import web3 from "./web3";
+import lottery from "./lottery";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function App() {
+  // o state é um objeto que contém dados que serão renderizados na tela
+  const [manager, setManager] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [balance, setBalance] = useState("");
+  const [value, setValue] = useState("");
+  const [message, setMessage] = useState("");
+  const [winner, setWinner] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
-    this.state = ({ manager: '' });
-  }
+  useEffect(() => {
 
-  async componentDidMount() {
-    const manager = await lottery.methods.manager().call();
+    async function fetchData() {
+      // chamando os metodos do contrato
+      const manager = await lottery.methods.manager().call();
+      const players = await lottery.methods.returnPlayers().call();
+      // pegando o total de valor do contrato
+      const balance = await web3.eth.getBalance(lottery.options.address);
+      const winner = await lottery.methods.winner().call();
 
-    this.setState({ manager });
-  }
+      setManager(manager);
+      setPlayers(players);
+      setBalance(balance);
+      setWinner(winner);
+    }
+
+    fetchData();
+
+  }, []);
+
+  // Usa-se arrow function para não precisar fazer o bind do this
+  // bind é usado para que o this seja o mesmo dentro da função
+  async function handleSubmit(event) {
+    // previne o comportamento padrão do submit
+    event.preventDefault();
+
+    // precisamos recuperar uma lista de contas para especificar quem está enviando a transação
+    const accounts = await web3.eth.getAccounts();
+
   
-  render() {
-    return(
+    // definindo uma mensagem de espera
+    setMessage("Waiting on transaction success...")
+
+
+    await lottery.methods.enter().send({
+      from: accounts[0],
+      value: web3.utils.toWei(value, "ether"),
+    });
+    // definindo uma mensagem de sucesso
+    setMessage("You have been entered");
+  };
+
+  async function handleClick() {
+    const accounts = await web3.eth.getAccounts();
+
+    setMessage("Waiting on transaction success...")
+
+    await lottery.methods.pickWinner().send({
+      from: accounts[0]
+    })
+
+    setMessage("A winner has been picked");
+  }
+
+    return (
       <div>
         <h2>Lottery Contract</h2>
-        <p>This contract is managed by {this.state.manager}</p>
-      </div>
+        <p>
+          This contract is managed by {manager}. There are currently{" "}
+          {players.length} people entered, competing to win{" "}
+          {web3.utils.fromWei(balance, "ether")} ether!
+        </p>
 
+        <hr />
+
+        <form onSubmit={handleSubmit}>
+          <h4>Want to try your luck?</h4>
+          <div>
+            <label>Amount of ether to enter</label>
+            <input
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+            />
+          </div>
+          <button> Enter </button>
+        </form>
+
+        <hr />
+
+        <h4>Ready to pick a Winner?</h4>
+        <button onClick={handleClick}>Pick a Winner</button>
+
+        <p>The winner is {winner}</p>
+
+        <hr />
+        <h1>{message}</h1>
+      </div>
     );
   }
-}
 
 export default App;

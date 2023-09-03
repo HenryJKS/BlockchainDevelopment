@@ -3,7 +3,7 @@
 import web3 from "./web3";
 
 // Importando o endereço em que o contrato foi deployado
-const address = "0xfAa5D18a2Cadeb6255CdC3534E0096CeB6D14E83";
+const address = "0x06fB63e02271F81fd150f058e8AC9FeF98c18f63";
 
 // Importando o ABI do contrato
 const abi = [
@@ -25,7 +25,7 @@ const abi = [
   {
     inputs: [],
     name: "pickWinner",
-    outputs: [],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -40,12 +40,15 @@ const abi = [
     inputs: [],
     name: "returnPlayers",
     outputs: [
-      {
-        internalType: "address payable[]",
-        name: "",
-        type: "address[]",
-      },
+      { internalType: "address payable[]", name: "", type: "address[]" },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "winner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },

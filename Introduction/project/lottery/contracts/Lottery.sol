@@ -4,8 +4,12 @@ pragma solidity ^0.8.9;
 contract Lottery {
     // Queremos usar essa variável onde terá o endereço do dono do contrato
     address public manager;
+
     // Uma array onde os endereços dos jogadores vão entrar na loteria
     address payable[] public players;
+
+    // Variavel para guardar o ganhador
+    address public winner;
 
     constructor() {
         // usamos o construtor para setar o endereço na variável managager de quem implantar o contrato na rede
@@ -40,17 +44,21 @@ contract Lottery {
 
     // criando a função para escolher um vencedor
     // com o random() podemos acessar um indice através do length de um array dos endereços dos players
-    function pickWinner() public restricted {
+    function pickWinner() public restricted returns(address) {
 
         uint index = random() % players.length;
 
         // transferindo o valor do contrato para o endereço do vencedor
         players[index].transfer(address(this).balance);
 
+        // setando o ganhador
+        winner = players[index];
+
         // Para sempre que finalizar um sorteio inicializará outro
         // o (0) significa que o array inicializará com nenhum elementos.
         players = new address payable[](0);
 
+        return winner;
     }
 
     /* um modifier é um pedaço de código que pode ser reutilizado em várias funções em Solidity. 

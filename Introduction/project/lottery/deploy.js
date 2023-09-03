@@ -15,7 +15,7 @@ const provider = new HDWalletProvider(
     'between inform top steel awkward below dress mother spare banana iron law',
 
     // segundo argumento: link para a rede teste.
-    'https://sepolia.infura.io/v3/e879c54bce92402bac35cddc3db2ac0a'
+    'https://sepolia.infura.io/v3/e879c54bce92402bac35cddc3db2ac0a',
 );
 
 // Instanciando o Web3 com o provider.
