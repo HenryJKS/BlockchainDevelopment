@@ -14,7 +14,6 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-
     async function fetchData() {
       // chamando os metodos do contrato
       const manager = await lottery.methods.manager().call();
@@ -30,7 +29,6 @@ function App() {
     }
 
     fetchData();
-
   }, []);
 
   // Usa-se arrow function para não precisar fazer o bind do this
@@ -42,65 +40,87 @@ function App() {
     // precisamos recuperar uma lista de contas para especificar quem está enviando a transação
     const accounts = await web3.eth.getAccounts();
 
-  
+    // Check if the value is greater than 0.11
+    if (Number(value) <= 0.11) {
+      setMessage("The value must be greater than 0.11 ether");
+      return;
+    }
+
     // definindo uma mensagem de espera
-    setMessage("Waiting on transaction success...")
+    setMessage("Waiting on transaction success...");
+    await lottery.methods
+      .enter()
+      .send({
+        from: accounts[0],
+        value: web3.utils.toWei(value, "ether"),
+      })
+      // se a transação for bem sucedida a mensagem será alterada
+      .then(() => { 
+        setMessage("You have been entered");
+      })
+      // se a transação for mal sucedida a mensagem será alterada
+      .catch((error) => {
+        if (
+          error.message.includes(
+            "MetaMask Tx Signature: User denied transaction signature."
+          )
+        ) {
+          setMessage("Transaction rejected by user");
+        }
+      });
+  }
 
-
-    await lottery.methods.enter().send({
-      from: accounts[0],
-      value: web3.utils.toWei(value, "ether"),
-    });
-    // definindo uma mensagem de sucesso
-    setMessage("You have been entered");
-  };
+  // função para verificar se o valor digitado é um número
+  function handleValueChange(event) {
+    const value = event.target.value;
+    if (!isNaN(value)) {
+      setValue(value);
+    }
+  }
 
   async function handleClick() {
     const accounts = await web3.eth.getAccounts();
 
-    setMessage("Waiting on transaction success...")
+    setMessage("Waiting on transaction success..");
 
     await lottery.methods.pickWinner().send({
-      from: accounts[0]
-    })
+      from: accounts[0],
+    });
 
     setMessage("A winner has been picked");
   }
 
-    return (
-      <div>
-        <h2>Lottery Contract</h2>
-        <p>
-          This contract is managed by {manager}. There are currently{" "}
-          {players.length} people entered, competing to win{" "}
-          {web3.utils.fromWei(balance, "ether")} ether!
-        </p>
+  return (
+    <div>
+      <h2>Lottery Contract</h2>
+      <p>
+        This contract is managed by {manager}. There are currently{" "}
+        {players.length} people entered, competing to win{" "}
+        {web3.utils.fromWei(balance, "ether")} ether!
+      </p>
 
-        <hr />
+      <hr />
 
-        <form onSubmit={handleSubmit}>
-          <h4>Want to try your luck?</h4>
-          <div>
-            <label>Amount of ether to enter</label>
-            <input
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-            />
-          </div>
-          <button> Enter </button>
-        </form>
+      <form onSubmit={handleSubmit}>
+        <h4>Want to try your luck?</h4>
+        <div>
+          <label>Amount of ether to enter</label>
+          <input value={value} onChange={handleValueChange} />
+        </div>
+        <button> Enter </button>
+      </form>
 
-        <hr />
+      <hr />
 
-        <h4>Ready to pick a Winner?</h4>
-        <button onClick={handleClick}>Pick a Winner</button>
+      <h4>Ready to pick a Winner?</h4>
+      <button onClick={handleClick}>Pick a Winner</button>
 
-        <p>The winner is {winner}</p>
+      <p>The winner is {winner}</p>
 
-        <hr />
-        <h1>{message}</h1>
-      </div>
-    );
-  }
+      <hr />
+      <h1>{message}</h1>
+    </div>
+  );
+}
 
 export default App;
